@@ -1,0 +1,26 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "A backend-heavy ticketing system inspired by tools like Jira and Zendesk, built to explore how real systems handle workflows, consistency, and database-driven logic.",
+  "homepage": "https://github.com/SaiCharan007-max/Ticketing-And-WorkFlow-Management-System#readme",
+  "bugs": {
+    "url": "https://github.com/SaiCharan007-max/Ticketing-And-WorkFlow-Management-System/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SaiCharan007-max/Ticketing-And-WorkFlow-Management-System.git"
+  },
+  "license": "ISC",
+  "author": "Chenna Sai Charan",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "pg": "^8.20.0"
+  }
+}
