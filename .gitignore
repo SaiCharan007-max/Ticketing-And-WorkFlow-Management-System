@@ -11,6 +11,8 @@ node_modules/
 .env
 .env.*
 !.env.example
+.envrc
+*.local
 
 # =========================
 # Logs
@@ -57,6 +59,8 @@ Thumbs.db
 
 tmp/
 temp/
+.codex-temp/
+.npm/
 
 # =========================
 # PostgreSQL Dumps / Local DB Files
