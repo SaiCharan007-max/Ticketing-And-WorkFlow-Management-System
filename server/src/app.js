@@ -9,4 +9,5 @@ app.use(express.json());
 // routes
 app.use("/api/tickets", ticketRoutes);
 
+app.use(globalErrorHandler);
 export default app;
