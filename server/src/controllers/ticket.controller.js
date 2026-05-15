@@ -1,38 +1,30 @@
 import { createTicketWorkflow } from "../services/ticket.service.js";
+import asyncHandler from "../utils/asyncHandler.js";
 
-export const createTicket = async (
+export const createTicket = asyncHandler(async (
     req,
-    res,
-    next
+    res
 ) => {
+    const {
+        title,
+        description,
+        priority,
+        categoryId
+    } = req.body;
 
-    try {
+    const createdBy = req.userId;
 
-        const {
+    const createdTicket =
+        await createTicketWorkflow({
             title,
             description,
             priority,
-            categoryId
-        } = req.body;
-
-        const createdBy = req.userId;
-
-        const createdTicket =
-            await createTicketWorkflow({
-                title,
-                description,
-                priority,
-                categoryId,
-                createdBy
-            });
-
-        res.status(201).json({
-            success: true,
-            ticket: createdTicket
+            categoryId,
+            createdBy
         });
 
-    } catch (err) {
-
-        next(err);
-    }
-};
+    res.status(201).json({
+        success: true,
+        ticket: createdTicket
+    });
+});
