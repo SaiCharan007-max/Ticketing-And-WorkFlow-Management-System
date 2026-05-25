@@ -1,10 +1,12 @@
-import { createTicketWorkflow } from "../services/ticket.service.js";
+import * as ticketService from "../services/ticket.service.js";
+
 import asyncHandler from "../utils/asyncHandler.js";
 
 export const createTicket = asyncHandler(async (
     req,
     res
 ) => {
+
     const {
         title,
         description,
@@ -15,7 +17,7 @@ export const createTicket = asyncHandler(async (
     const createdBy = req.userId;
 
     const createdTicket =
-        await createTicketWorkflow({
+        await ticketService.createTicketWorkflow({
             title,
             description,
             priority,
@@ -28,3 +30,88 @@ export const createTicket = asyncHandler(async (
         ticket: createdTicket
     });
 });
+
+export const updateTicketStatus = asyncHandler(
+    async (req, res) => {
+
+        const ticketId = req.params.id;
+
+        const { status } = req.body;
+
+        const updatedTicket =
+            await ticketService.updateTicketStatus({
+                ticketId,
+                status,
+                userId: req.userId,
+                userRole: req.userRole
+            });
+
+        res.status(200).json({
+            success: true,
+            ticket: updatedTicket
+        });
+    }
+);
+
+export const assignTicket = asyncHandler(
+    async (req, res) => {
+
+        const ticketId = req.params.id;
+
+        const { assignedTo } = req.body;
+
+        const updatedTicket =
+            await ticketService.updateTicketAssignment({
+                ticketId,
+                assignedTo,
+                assignedBy: req.userId
+            });
+
+        res.status(200).json({
+            success: true,
+            ticket: updatedTicket
+        });
+    }
+);
+
+export const getTicketById = asyncHandler(
+    async (req, res) => {
+        const ticket =
+            await ticketService.getTicketById(
+                req.params.id
+            );
+
+        res.status(200).json({
+            success: true,
+            ticket
+        });
+    }
+);
+
+export const getAssignedTickets = asyncHandler(
+    async (req, res) => {
+        const tickets =
+            await ticketService.getAssignedTickets(
+                req.userId
+            );
+
+        res.status(200).json({
+            success: true,
+            tickets
+        });
+    }
+);
+
+export const getMyTickets = asyncHandler(
+    async (req, res) => {
+        const tickets =
+            await ticketService.getMyTickets(
+                req.userId
+            );
+
+        res.status(200).json({
+            success: true,
+            tickets
+        });
+    }
+);
