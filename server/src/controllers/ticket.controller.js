@@ -115,15 +115,16 @@ export const getMyTickets = asyncHandler(
         const priority = req.query.priority;
         const sort = req.query.sort;
         const order = req.query.order;
+        const search = req.query.search;
 
         const tickets =
             await ticketService.getMyTickets(
-                { userId: req.userId, page, limit, status, priority, sort, order }
+                { userId: req.userId, page, limit, status, priority, sort, order, search }
             );
 
         res.status(200).json({
             success: true,
-            tickets
+            ...tickets
         });
     }
 );

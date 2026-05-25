@@ -372,7 +372,8 @@ export const getMyTickets = async ({
     status,
     priority,
     sort,
-    order
+    order,
+    search
 }) => {
 
     let client;
@@ -410,6 +411,12 @@ export const getMyTickets = async ({
             values.push(priority);
         }
 
+        if (search) {
+            sqlQuery += `
+                AND (title ILIKE $${values.length + 1} OR description ILIKE $${values.length + 1})
+            `;
+            values.push(`%${search}%`);
+        }
 
         const sortField =
             allowedSortFields[sort]
@@ -436,7 +443,12 @@ export const getMyTickets = async ({
                 values
             });
 
-        return tickets;
+        return {
+            page,
+            limit,
+            count : tickets.length,
+            tickets
+        };
 
     } finally {
 
