@@ -7,7 +7,8 @@ import * as userRepo from "../repositories/user.repository.js";
 
 import * as ticketRepo from "../repositories/ticket.repository.js";
 
-import allowedTransitions from "../helpers/allowedTransitions.js";
+import allowedTransitions from "../constants/allowedTransitions.js";
+import { allowedSortFields, allowedOrders } from "../constants/allowedQueryParamValues.js";
 
 import AppError from "../utils/AppError.js";
 
@@ -364,9 +365,15 @@ export const getAssignedTickets = async (
     }
 };
 
-export const getMyTickets = async (
-    userId
-) => {
+export const getMyTickets = async ({
+    userId,
+    page = 1,
+    limit = 10,
+    status,
+    priority,
+    sort,
+    order
+}) => {
 
     let client;
 
@@ -374,11 +381,60 @@ export const getMyTickets = async (
 
         client = await pool.connect();
 
+        const offset =
+            (page - 1) * limit;
+
+        let sqlQuery = `
+            SELECT *
+            FROM tickets
+            WHERE created_by = $1
+        `;
+
+        const values = [userId];
+
+        if (status) {
+
+            sqlQuery += `
+                AND status = $${values.length + 1}
+            `;
+
+            values.push(status);
+        }
+
+        if (priority) {
+
+            sqlQuery += `
+                AND priority = $${values.length + 1}
+            `;
+
+            values.push(priority);
+        }
+
+
+        const sortField =
+            allowedSortFields[sort]
+            || "created_at";
+
+        const sortOrder =
+            allowedOrders[
+            order?.toLowerCase()
+            ] || "DESC";
+
+        sqlQuery += `
+            ORDER BY ${sortField} ${sortOrder}
+            LIMIT $${values.length + 1}
+            OFFSET $${values.length + 2}
+        `;
+
+        values.push(limit);
+        values.push(offset);
+
         const tickets =
-            await ticketRepo.getTicketsByUserId(
+            await ticketRepo.getTicketsByUserId({
                 client,
-                userId
-            );
+                sqlQuery,
+                values
+            });
 
         return tickets;
 
@@ -389,3 +445,38 @@ export const getMyTickets = async (
         }
     }
 };
+
+export const getTicketHistory = async ({
+    ticketId,
+    userId,
+    userRole
+}) => {
+    let client;
+    try {
+        client = await pool.connect();
+        const ticket = await ticketRepo.getTicketById(client, ticketId);
+        if (!ticket)
+            throw new AppError(404, 'Ticket not found');
+
+        const { created_by, assigned_to } = ticket;
+
+        if (userRole === 'staff' && userId !== assigned_to)
+            throw new AppError(403, 'Forbidden: You can view history of tickets assigned to you');
+        if (userRole === 'user' && userId !== created_by)
+            throw new AppError(403, 'Forbidden: You can view history of tickets you created');
+
+        const history = await auditRepo.getAuditLogsByTicketId(client, ticketId);
+
+        return history;
+
+    } catch (err) {
+        throw err;
+    } finally {
+        if (client) {
+            client.release();
+        }
+    }
+}
+
+
+

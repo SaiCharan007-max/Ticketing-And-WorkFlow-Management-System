@@ -110,14 +110,7 @@ export const getAssignedTicketsByStaffId = async (client, staffId) => {
     return result.rows;
 };
 
-export const getTicketsByUserId = async (client, userId) => {
-    const result = await client.query(
-        `
-        SELECT *
-        FROM tickets
-        WHERE created_by=$1;
-        `,
-        [userId]
-    );
+export const getTicketsByUserId = async ({client, sqlQuery, values}) => {
+    const result = await client.query(sqlQuery, values);
     return result.rows;
 };

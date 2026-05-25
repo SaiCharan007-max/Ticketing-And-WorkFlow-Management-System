@@ -1,5 +1,5 @@
 import AppError from "../utils/AppError.js";
-import priorityValues from "../helpers/priorityValues.js";
+import priorityValues from "../constants/priorityValues.js";
 
 const validateCreateTicket = (
     req,
