@@ -16,16 +16,15 @@ export const createCategory = async ({
         client = await pool.connect();
 
         const existingCategory =
-            await categoryRepo.getCategoryByNameAndDepartment(
+            await categoryRepo.getCategoryByName(
                 client,
-                name,
-                departmentId
+                name
             );
 
         if (existingCategory) {
             throw new AppError(
                 409,
-                "Category already exists in this department"
+                "Category already exists"
             );
         }
 

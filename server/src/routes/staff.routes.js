@@ -1,6 +1,6 @@
 import express from "express";
-import authMiddleware from "../middlewares/auth.middleware";
-import { authorizeRoles } from "../middlewares/authorization.middleware";
+import authMiddleware from "../middlewares/auth.middleware.js";
+import { authorizeRoles } from "../middlewares/authorization.middleware.js";
 import {
     createStaff,
     getAllStaff,

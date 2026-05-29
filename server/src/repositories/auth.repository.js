@@ -3,8 +3,13 @@ import pool from "../config/db.js";
 export const findUserByEmail = async (email) => {
     const result = await pool.query(
         `
-            SELECT * FROM users
-            WHERE email = $1;
+            SELECT
+                u.*,
+                r.name AS role
+            FROM users u
+            JOIN roles r
+                ON u.role_id = r.id
+            WHERE u.email = $1;
         `,
         [email]
     );
@@ -19,11 +24,36 @@ export const createUser = async ({
 
     const result = await pool.query(
         `
-            INSERT INTO users
-                (email, password_hash, role)
-            VALUES
-                ($1, $2, 'USER')
-            RETURNING id, email, role, created_at;
+            WITH inserted_user AS (
+                INSERT INTO users
+                    (
+                        name,
+                        email,
+                        password_hash,
+                        role_id
+                    )
+                VALUES
+                    (
+                        split_part($1, '@', 1),
+                        $1,
+                        $2,
+                        (
+                            SELECT id
+                            FROM roles
+                            WHERE name = 'user'
+                        )
+                    )
+                RETURNING
+                    id,
+                    email,
+                    created_at
+            )
+            SELECT
+                id,
+                email,
+                'user' AS role,
+                created_at
+            FROM inserted_user;
         `,
         [email, hashedPassword]
     );

@@ -3,7 +3,8 @@ import authMiddleware from "../middlewares/auth.middleware.js";
 import { authorizeRoles } from "../middlewares/authorization.middleware.js";
 import {
     getTicketAnalytics,
-    getDepartmentAnalytics
+    getDepartmentAnalytics,
+    getstaffWorkload
 } from "../controllers/analytics.controller.js";
 
 const router = express.Router();

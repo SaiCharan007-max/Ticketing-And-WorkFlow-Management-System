@@ -284,11 +284,23 @@ export const updateTicketAssignment = async ({
                 assignedTo
             );
 
+        await assignmentRepo.createAssignment(client, {
+            ticketId,
+            assignedTo,
+            assignedBy
+        });
+
+        const auditAction =
+            ticket.assigned_to
+                ? "TICKET_REASSIGNED"
+                : "TICKET_ASSIGNED";
+
         await auditRepo.createAuditLog(client, {
             ticketId,
-            action: "TICKET_REASSIGNED",
+            action: auditAction,
             performedBy: assignedBy,
             metadata: {
+                previousAssignedTo: ticket.assigned_to,
                 assignedTo
             }
         });
@@ -314,7 +326,11 @@ export const updateTicketAssignment = async ({
 };
 
 export const getTicketById = async (
-    ticketId
+    {
+        ticketId,
+        userId,
+        userRole
+    }
 ) => {
 
     let client;
@@ -328,6 +344,33 @@ export const getTicketById = async (
                 client,
                 ticketId
             );
+
+        if (!ticket) {
+            throw new AppError(
+                404,
+                "Ticket not found"
+            );
+        }
+
+        if (
+            userRole === "staff" &&
+            ticket.assigned_to !== userId
+        ) {
+            throw new AppError(
+                403,
+                "Forbidden: You can only view tickets assigned to you"
+            );
+        }
+
+        if (
+            userRole === "user" &&
+            ticket.created_by !== userId
+        ) {
+            throw new AppError(
+                403,
+                "Forbidden: You can only view tickets you created"
+            );
+        }
 
         return ticket;
 

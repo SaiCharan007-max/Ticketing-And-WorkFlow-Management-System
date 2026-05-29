@@ -46,6 +46,10 @@ export const updateTicketAssignment = async (client, ticketId, assignedTo) => {
         UPDATE tickets
         SET
             assigned_to = $1,
+            status = CASE
+                WHEN status = 'UNASSIGNED' THEN 'ASSIGNED'
+                ELSE status
+            END,
             updated_at = NOW()
         WHERE id = $2
         RETURNING *;

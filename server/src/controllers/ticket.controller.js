@@ -77,9 +77,11 @@ export const assignTicket = asyncHandler(
 export const getTicketById = asyncHandler(
     async (req, res) => {
         const ticket =
-            await ticketService.getTicketById(
-                req.params.id
-            );
+            await ticketService.getTicketById({
+                ticketId: req.params.id,
+                userId: req.userId,
+                userRole: req.userRole
+            });
 
         res.status(200).json({
             success: true,

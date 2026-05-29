@@ -6,7 +6,7 @@ import staffRoutes from "./routes/staff.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import commentsRoutes from "./routes/comments.routes.js";
 import analyticsRoutes from "./routes/analytics.routes.js";
-import globalErrorHandler from "./middlewares/globalErrorHandler.js";
+import globalErrorHandler from "./middlewares/error.middleware.js";
 
 
 const app = express();

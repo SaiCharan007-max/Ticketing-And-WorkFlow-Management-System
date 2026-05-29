@@ -65,6 +65,7 @@ VALUES
 INSERT INTO users (
     name,
     email,
+    password_hash,
     role_id,
     department_id
 )
@@ -72,18 +73,21 @@ VALUES
 (
     'Admin IT',
     'adminit@gmail.com',
+    '$2b$10$gqer1EtgJMtQF4BIP/BrresVjyT3rqMTEBEbtpXP4FpMW18lIyogu',
     (SELECT id FROM roles WHERE name = 'admin'),
     (SELECT id FROM departments WHERE name = 'IT')
 ),
 (
     'Admin Academic',
     'adminacademic@gmail.com',
+    '$2b$10$gqer1EtgJMtQF4BIP/BrresVjyT3rqMTEBEbtpXP4FpMW18lIyogu',
     (SELECT id FROM roles WHERE name = 'admin'),
     (SELECT id FROM departments WHERE name = 'Academic')
 ),
 (
     'Admin Finance',
     'adminfinance@gmail.com',
+    '$2b$10$gqer1EtgJMtQF4BIP/BrresVjyT3rqMTEBEbtpXP4FpMW18lIyogu',
     (SELECT id FROM roles WHERE name = 'admin'),
     (SELECT id FROM departments WHERE name = 'Finance')
 );
@@ -95,6 +99,7 @@ VALUES
 INSERT INTO users (
     name,
     email,
+    password_hash,
     role_id,
     department_id
 )
@@ -102,30 +107,35 @@ VALUES
 (
     'IT Staff 1',
     'itstaff1@gmail.com',
+    '$2b$10$gqer1EtgJMtQF4BIP/BrresVjyT3rqMTEBEbtpXP4FpMW18lIyogu',
     (SELECT id FROM roles WHERE name = 'staff'),
     (SELECT id FROM departments WHERE name = 'IT')
 ),
 (
     'IT Staff 2',
     'itstaff2@gmail.com',
+    '$2b$10$gqer1EtgJMtQF4BIP/BrresVjyT3rqMTEBEbtpXP4FpMW18lIyogu',
     (SELECT id FROM roles WHERE name = 'staff'),
     (SELECT id FROM departments WHERE name = 'IT')
 ),
 (
     'Finance Staff 1',
     'financestaff1@gmail.com',
+    '$2b$10$gqer1EtgJMtQF4BIP/BrresVjyT3rqMTEBEbtpXP4FpMW18lIyogu',
     (SELECT id FROM roles WHERE name = 'staff'),
     (SELECT id FROM departments WHERE name = 'Finance')
 ),
 (
     'Hostel Staff 1',
     'hostelstaff1@gmail.com',
+    '$2b$10$gqer1EtgJMtQF4BIP/BrresVjyT3rqMTEBEbtpXP4FpMW18lIyogu',
     (SELECT id FROM roles WHERE name = 'staff'),
     (SELECT id FROM departments WHERE name = 'Hostel')
 ),
 (
     'Academic Staff 1',
     'academicstaff1@gmail.com',
+    '$2b$10$gqer1EtgJMtQF4BIP/BrresVjyT3rqMTEBEbtpXP4FpMW18lIyogu',
     (SELECT id FROM roles WHERE name = 'staff'),
     (SELECT id FROM departments WHERE name = 'Academic')
 );
@@ -137,6 +147,7 @@ VALUES
 INSERT INTO users (
     name,
     email,
+    password_hash,
     role_id,
     department_id
 )
@@ -144,18 +155,21 @@ VALUES
 (
     'Student 1',
     'student1@gmail.com',
+    '$2b$10$gqer1EtgJMtQF4BIP/BrresVjyT3rqMTEBEbtpXP4FpMW18lIyogu',
     (SELECT id FROM roles WHERE name = 'user'),
     NULL
 ),
 (
     'Student 2',
     'student2@gmail.com',
+    '$2b$10$gqer1EtgJMtQF4BIP/BrresVjyT3rqMTEBEbtpXP4FpMW18lIyogu',
     (SELECT id FROM roles WHERE name = 'user'),
     NULL
 ),
 (
     'Student 3',
     'student3@gmail.com',
+    '$2b$10$gqer1EtgJMtQF4BIP/BrresVjyT3rqMTEBEbtpXP4FpMW18lIyogu',
     (SELECT id FROM roles WHERE name = 'user'),
     NULL
 );

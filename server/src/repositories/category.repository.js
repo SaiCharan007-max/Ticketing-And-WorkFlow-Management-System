@@ -6,7 +6,7 @@ export const createCategory = async (
 
     const result = await client.query(
         `
-        INSERT INTO categories (
+        INSERT INTO ticket_categories (
             name,
             department_id
         )
@@ -19,40 +19,46 @@ export const createCategory = async (
     return result.rows[0];
 };
 
-export const getAllCategories = async (client) => {
+export const getAllCategories = async (
+    client
+) => {
 
     const result = await client.query(
         `
         SELECT
-            c.id,
-            c.name,
-            c.department_id,
+            tc.id,
+            tc.name,
+            tc.department_id,
             d.name AS department_name,
-            c.created_at
-        FROM categories c
+            tc.created_at,
+            tc.updated_at
+        FROM ticket_categories tc
         JOIN departments d
-            ON c.department_id = d.id
-        ORDER BY c.created_at DESC;
+            ON tc.department_id = d.id
+        ORDER BY tc.created_at DESC;
         `
     );
 
     return result.rows;
 };
 
-export const getCategoryByNameAndDepartment = async (
+export const getCategoryByName = async (
     client,
-    name,
-    departmentId
+    name
 ) => {
 
     const result = await client.query(
         `
-        SELECT *
-        FROM categories
-        WHERE name = $1
-        AND department_id = $2;
+        SELECT
+            id,
+            name,
+            department_id,
+            created_at,
+            updated_at
+        FROM ticket_categories
+        WHERE name = $1;
         `,
-        [name, departmentId]
+        [name]
     );
 
     return result.rows[0];
@@ -65,8 +71,13 @@ export const getCategoryById = async (
 
     const result = await client.query(
         `
-        SELECT *
-        FROM categories
+        SELECT
+            id,
+            name,
+            department_id,
+            created_at,
+            updated_at
+        FROM ticket_categories
         WHERE id = $1;
         `,
         [categoryId]
@@ -82,7 +93,7 @@ export const deleteCategory = async (
 
     const result = await client.query(
         `
-        DELETE FROM categories
+        DELETE FROM ticket_categories
         WHERE id = $1
         RETURNING *;
         `,
@@ -92,3 +103,4 @@ export const deleteCategory = async (
     return result.rows[0];
 };
 
+export const findCategoryById = getCategoryById;

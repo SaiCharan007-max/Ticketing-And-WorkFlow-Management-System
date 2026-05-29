@@ -2,6 +2,7 @@ import pool from "../config/db.js";
 import * as ticketRepo from "../repositories/ticket.repository.js";
 import * as commentRepo from "../repositories/comment.repository.js";
 import * as auditRepo from "../repositories/audit.repository.js";
+import AppError from "../utils/AppError.js";
 
 export const createComment = async ({
     ticketId,
@@ -62,9 +63,9 @@ export const getCommentsByTicketId = async ({ ticketId, userId, userRole }) => {
 
         const { created_by, assigned_to } = ticket;
 
-        if (userRole === 'staff' && createdBy !== assigned_to)
+        if (userRole === 'staff' && userId !== assigned_to)
             throw new AppError(403, 'Forbidden: You can only get comments of tickets assigned to you');
-        if (userRole === 'user' && createdBy !== created_by)
+        if (userRole === 'user' && userId !== created_by)
             throw new AppError(403, 'Forbidden: You can only get comments of tickets you created');
 
         const result = await commentRepo.getCommentsByTicketId(client, ticketId);
@@ -77,4 +78,4 @@ export const getCommentsByTicketId = async ({ ticketId, userId, userRole }) => {
             client.release();
         }
     }
-}
+};

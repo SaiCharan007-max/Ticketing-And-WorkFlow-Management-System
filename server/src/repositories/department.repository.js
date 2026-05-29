@@ -5,7 +5,9 @@ export const createDepartment = async (
 
     const result = await client.query(
         `
-        INSERT INTO departments (name)
+        INSERT INTO departments (
+            name
+        )
         VALUES ($1)
         RETURNING *;
         `,
@@ -15,11 +17,17 @@ export const createDepartment = async (
     return result.rows[0];
 };
 
-export const getAllDepartments = async (client) => {
+export const getAllDepartments = async (
+    client
+) => {
 
     const result = await client.query(
         `
-        SELECT *
+        SELECT
+            id,
+            name,
+            created_at,
+            updated_at
         FROM departments
         ORDER BY created_at DESC;
         `
@@ -35,7 +43,11 @@ export const getDepartmentByName = async (
 
     const result = await client.query(
         `
-        SELECT *
+        SELECT
+            id,
+            name,
+            created_at,
+            updated_at
         FROM departments
         WHERE name = $1;
         `,
@@ -52,7 +64,11 @@ export const getDepartmentById = async (
 
     const result = await client.query(
         `
-        SELECT *
+        SELECT
+            id,
+            name,
+            created_at,
+            updated_at
         FROM departments
         WHERE id = $1;
         `,
@@ -86,7 +102,7 @@ export const countDepartmentStaff = async (
 
     const result = await client.query(
         `
-        SELECT COUNT(*)
+        SELECT COUNT(*)::INT AS count
         FROM users
         WHERE department_id = $1;
         `,
@@ -103,8 +119,8 @@ export const countDepartmentCategories = async (
 
     const result = await client.query(
         `
-        SELECT COUNT(*)
-        FROM categories
+        SELECT COUNT(*)::INT AS count
+        FROM ticket_categories
         WHERE department_id = $1;
         `,
         [departmentId]
