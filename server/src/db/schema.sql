@@ -2,7 +2,6 @@
 -- DROP OLD TABLES
 -- =========================
 
-DROP TABLE IF EXISTS comments CASCADE;
 DROP TABLE IF EXISTS audit_logs CASCADE;
 DROP TABLE IF EXISTS ticket_assignments CASCADE;
 DROP TABLE IF EXISTS tickets CASCADE;
@@ -39,7 +38,6 @@ CREATE TYPE ticket_priority AS ENUM (
 
 CREATE TABLE roles (
     id SERIAL PRIMARY KEY,
-
     name TEXT UNIQUE NOT NULL
 );
 
@@ -49,12 +47,7 @@ CREATE TABLE roles (
 
 CREATE TABLE departments (
     id SERIAL PRIMARY KEY,
-
-    name TEXT UNIQUE NOT NULL,
-
-    created_at TIMESTAMP DEFAULT NOW(),
-
-    updated_at TIMESTAMP DEFAULT NOW()
+    name TEXT UNIQUE NOT NULL
 );
 
 -- =========================
@@ -68,11 +61,7 @@ CREATE TABLE ticket_categories (
 
     department_id INT NOT NULL
     REFERENCES departments(id)
-    ON DELETE CASCADE,
-
-    created_at TIMESTAMP DEFAULT NOW(),
-
-    updated_at TIMESTAMP DEFAULT NOW()
+    ON DELETE CASCADE
 );
 
 -- =========================
@@ -83,21 +72,15 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
 
     name TEXT NOT NULL,
-
     email TEXT UNIQUE NOT NULL,
-
-    password_hash TEXT NOT NULL,
 
     role_id INT NOT NULL
     REFERENCES roles(id),
 
     department_id INT
-    REFERENCES departments(id)
-    ON DELETE SET NULL,
+    REFERENCES departments(id),
 
-    created_at TIMESTAMP DEFAULT NOW(),
-
-    updated_at TIMESTAMP DEFAULT NOW()
+    created_at TIMESTAMP DEFAULT NOW()
 );
 
 -- =========================
@@ -108,16 +91,11 @@ CREATE TABLE tickets (
     id SERIAL PRIMARY KEY,
 
     title TEXT NOT NULL,
-
     description TEXT,
 
-    status ticket_status
-    NOT NULL
-    DEFAULT 'UNASSIGNED',
+    status ticket_status NOT NULL DEFAULT 'UNASSIGNED',
 
-    priority ticket_priority
-    NOT NULL
-    DEFAULT 'MEDIUM',
+    priority ticket_priority NOT NULL DEFAULT 'MEDIUM',
 
     category_id INT NOT NULL
     REFERENCES ticket_categories(id),
@@ -126,8 +104,7 @@ CREATE TABLE tickets (
     REFERENCES departments(id),
 
     assigned_to INT
-    REFERENCES users(id)
-    ON DELETE SET NULL,
+    REFERENCES users(id),
 
     created_by INT NOT NULL
     REFERENCES users(id),
@@ -144,7 +121,6 @@ CREATE TABLE tickets (
     created_at TIMESTAMP DEFAULT NOW(),
 
     updated_at TIMESTAMP DEFAULT NOW(),
-
     CHECK (
         ai_confidence_score IS NULL
         OR (
@@ -152,25 +128,6 @@ CREATE TABLE tickets (
             AND ai_confidence_score <= 100
         )
     )
-);
-
--- =========================
--- COMMENTS
--- =========================
-
-CREATE TABLE comments (
-    id SERIAL PRIMARY KEY,
-
-    content TEXT NOT NULL,
-
-    ticket_id INT NOT NULL
-    REFERENCES tickets(id)
-    ON DELETE CASCADE,
-
-    created_by INT NOT NULL
-    REFERENCES users(id),
-
-    created_at TIMESTAMP DEFAULT NOW()
 );
 
 -- =========================
@@ -230,9 +187,6 @@ ON tickets(assigned_to);
 CREATE INDEX idx_tickets_category
 ON tickets(category_id);
 
-CREATE INDEX idx_tickets_created_by
-ON tickets(created_by);
-
 CREATE INDEX idx_ticket_assignments_ticket
 ON ticket_assignments(ticket_id);
 
@@ -241,6 +195,3 @@ ON ticket_assignments(assigned_to);
 
 CREATE INDEX idx_audit_logs_ticket
 ON audit_logs(ticket_id);
-
-CREATE INDEX idx_comments_ticket
-ON comments(ticket_id);

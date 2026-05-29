@@ -7,7 +7,7 @@ import authRoutes from "./routes/auth.routes.js";
 import commentsRoutes from "./routes/comments.routes.js";
 import analyticsRoutes from "./routes/analytics.routes.js";
 import globalErrorHandler from "./middlewares/error.middleware.js";
-
+import redisClient from "./config/redis.js";
 
 const app = express();
 

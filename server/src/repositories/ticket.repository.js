@@ -102,15 +102,8 @@ export const updateTicketStatusRepo = async (client, ticketId, status) => {
     return result.rows[0];
 }
 
-export const getAssignedTicketsByStaffId = async (client, staffId) => {
-    const result = await client.query(
-        `
-        SELECT *
-        FROM tickets
-        WHERE assigned_to = $1;
-        `,
-        [staffId]
-    );
+export const getAssignedTicketsByStaffId = async ({client, sqlQuery, values}) => {
+    const result = await client.query(sqlQuery, values);
     return result.rows;
 };
 

@@ -1,4 +1,5 @@
 import pool from "../config/db.js";
+import redisClient from "../config/redis.js";
 
 import * as assignmentRepo from "../repositories/assignment.repository.js";
 import * as auditRepo from "../repositories/audit.repository.js";
@@ -116,7 +117,11 @@ export const createTicketWorkflow = async (
 
         await client.query("COMMIT");
 
-        return createdTicket;
+        await redisClient.del(
+            "analytics:tickets",
+            "analytics:departments",
+            "analytics:staff-workload"
+        );
 
     } catch (err) {
 
@@ -211,8 +216,12 @@ export const updateTicketStatus = async ({
                 to: status
             }
         });
-
         await client.query("COMMIT");
+
+        await redisClient.del("ticketAnalytics");
+        await redisClient.del("departmentAnalytics");
+        await redisClient.del("staffWorkload");
+
 
         return updatedTicket;
 
@@ -307,6 +316,12 @@ export const updateTicketAssignment = async ({
 
         await client.query("COMMIT");
 
+        await redisClient.del(
+            "analytics:tickets",
+            "analytics:departments",
+            "analytics:staff-workload"
+        );
+
         return updatedTicket;
 
     } catch (err) {
@@ -382,9 +397,16 @@ export const getTicketById = async (
     }
 };
 
-export const getAssignedTickets = async (
-    staffId
-) => {
+export const getAssignedTickets = async ({
+    staffId,
+    page = 1,
+    limit = 10,
+    status,
+    priority,
+    sort,
+    order,
+    search
+}) => {
 
     let client;
 
@@ -392,13 +414,73 @@ export const getAssignedTickets = async (
 
         client = await pool.connect();
 
-        const tickets =
-            await ticketRepo.getAssignedTicketsByStaffId(
-                client,
-                staffId
-            );
+        const offset =
+            (page - 1) * limit;
 
-        return tickets;
+        let sqlQuery = `
+            SELECT *
+            FROM tickets
+            WHERE assigned_to = $1
+        `;
+
+        const values = [staffId];
+
+        if (status) {
+
+            sqlQuery += `
+                AND status = $${values.length + 1}
+            `;
+
+            values.push(status);
+        }
+
+        if (priority) {
+
+            sqlQuery += `
+                AND priority = $${values.length + 1}
+            `;
+
+            values.push(priority);
+        }
+
+        if (search) {
+            sqlQuery += `
+                AND (title ILIKE $${values.length + 1} OR description ILIKE $${values.length + 1})
+            `;
+            values.push(`%${search}%`);
+        }
+
+        const sortField =
+            allowedSortFields[sort]
+            || "created_at";
+
+        const sortOrder =
+            allowedOrders[
+            order?.toLowerCase()
+            ] || "DESC";
+
+        sqlQuery += `
+            ORDER BY ${sortField} ${sortOrder}
+            LIMIT $${values.length + 1}
+            OFFSET $${values.length + 2}
+        `;
+
+        values.push(limit);
+        values.push(offset);
+
+        const tickets =
+            await ticketRepo.getAssignedTicketsByStaffId({
+                client,
+                sqlQuery,
+                values
+            });
+
+        return {
+            page,
+            limit,
+            count: tickets.length,
+            tickets
+        };
 
     } finally {
 
@@ -489,7 +571,7 @@ export const getMyTickets = async ({
         return {
             page,
             limit,
-            count : tickets.length,
+            count: tickets.length,
             tickets
         };
 
