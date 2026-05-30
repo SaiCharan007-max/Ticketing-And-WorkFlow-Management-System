@@ -10,6 +10,7 @@ import * as ticketRepo from "../repositories/ticket.repository.js";
 
 import allowedTransitions from "../constants/allowedTransitions.js";
 import { allowedSortFields, allowedOrders } from "../constants/allowedQueryParamValues.js";
+import SLA_HOURS from "../constants/slaHours.js";
 
 import AppError from "../utils/AppError.js";
 
@@ -70,6 +71,17 @@ export const createTicketWorkflow = async (
         const finalPriority =
             priority || "MEDIUM";
 
+
+        const deadlineTime = SLA_HOURS[finalPriority];
+
+        if (!deadlineTime)
+            throw new AppError(500, "SLA escalation hours missing");
+
+        const slaDeadline = new Date();
+        slaDeadline.setHours(
+            slaDeadline.getHours() + deadlineTime
+        );
+
         const ticketObj = {
             title,
             description,
@@ -78,7 +90,8 @@ export const createTicketWorkflow = async (
             categoryId,
             departmentId,
             status,
-            createdBy
+            createdBy,
+            slaDeadline
         };
 
         const createdTicket =
@@ -122,6 +135,8 @@ export const createTicketWorkflow = async (
             "analytics:departments",
             "analytics:staff-workload"
         );
+
+        return createdTicket;
 
     } catch (err) {
 

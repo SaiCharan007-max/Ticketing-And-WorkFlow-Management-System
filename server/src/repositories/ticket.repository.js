@@ -7,7 +7,8 @@ export const createTicket = async (client, ticketData) => {
         categoryId,
         departmentId,
         assignedTo,
-        createdBy
+        createdBy,
+        slaDeadline,
     } = ticketData;
 
     const result = await client.query(
@@ -20,9 +21,10 @@ export const createTicket = async (client, ticketData) => {
             category_id,
             department_id,
             assigned_to,
-            created_by
+            created_by,
+            sla_deadline
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         RETURNING *;
         `,
         [
@@ -33,7 +35,8 @@ export const createTicket = async (client, ticketData) => {
             categoryId,
             departmentId,
             assignedTo,
-            createdBy
+            createdBy,
+            slaDeadline,
         ]
     );
 
@@ -111,3 +114,24 @@ export const getTicketsByUserId = async ({client, sqlQuery, values}) => {
     const result = await client.query(sqlQuery, values);
     return result.rows;
 };
+
+
+export const updateTicketPriority = async ({
+    client,
+    ticketId,
+    priority,
+    slaDeadline
+}) => {
+    const result = await client.query(
+        `
+            UPDATE tickets
+            SET
+                priority = $1,
+                sla_deadline = $2,
+                updated_at = NOW()
+            WHERE id = $3
+            RETURNING *;
+        `, [priority, slaDeadline, ticketId]
+    );
+    return result.rows[0];
+}
