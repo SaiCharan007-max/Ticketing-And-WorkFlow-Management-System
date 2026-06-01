@@ -1,12 +1,12 @@
 import asyncHandler from "../utils/asyncHandler.js";
 import * as slaService from "../services/sla.service.js";
 
-export const processSlaBreaches = asyncHandler(
+export const processAllSlaBreaches = asyncHandler(
     async (req, res) => {
 
         const result =
             await slaService
-                .processSlaBreaches();
+                .processAllSlaBreaches();
 
         res.status(200).json({
             success: true,

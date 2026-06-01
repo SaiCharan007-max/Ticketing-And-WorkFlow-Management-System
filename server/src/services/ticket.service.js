@@ -1,6 +1,6 @@
 import pool from "../config/db.js";
 import redisClient from "../config/redis.js";
-
+import { addSlaJob } from "../queues/sla.queue.js";
 import * as assignmentRepo from "../repositories/assignment.repository.js";
 import * as auditRepo from "../repositories/audit.repository.js";
 import * as categoryRepo from "../repositories/category.repository.js";
@@ -99,6 +99,16 @@ export const createTicketWorkflow = async (
                 client,
                 ticketObj
             );
+
+
+
+        console.log(addSlaJob);
+
+        await addSlaJob({
+            ticketId: createdTicket.id,
+            delay: deadlineTime * 60 * 60 * 1000
+        });
+
 
         await auditRepo.createAuditLog(client, {
             ticketId: createdTicket.id,

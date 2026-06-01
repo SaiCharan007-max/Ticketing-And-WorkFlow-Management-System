@@ -1,8 +1,8 @@
 const SLA_HOURS = {
-    "LOW": 72, // 3 days
-    "MEDIUM": 48, // 2 days
-    "HIGH": 24, // 1 day
-    "URGENT": 4 // 4 hours
+    "LOW": 0.00278, // 3 days
+    "MEDIUM": 0.00278, // 2 days
+    "HIGH": 0.00278, // 1 day
+    "URGENT": 0.00278 // 4 hours
 };
 
 export default SLA_HOURS;
