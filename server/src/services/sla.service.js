@@ -6,6 +6,8 @@ import * as auditRepo from "../repositories/audit.repository.js";
 import ESCALATION_MAP from "../constants/escalationMap.js";
 import * as slaRepo from "../repositories/sla.repository.js";
 import { addSlaJob } from "../queues/sla.queue.js";
+import { addEmailJob } from "../queues/email.queue.js";
+import EMAIL_TEMPLATES from "../constants/emailTemplates.js";
 
 export const processAllSlaBreaches = async () => {
     let client;
@@ -121,6 +123,14 @@ export const processSingleTicketEscalation = async (ticketId) => {
             );
 
             await client.query("COMMIT");
+
+            if (ticket.assigned_to) {
+                await addEmailJob({
+                    ticketId: ticket.id,
+                    recipientId: ticket.assigned_to,
+                    template: EMAIL_TEMPLATES.SLA_ESCALATED
+                });
+            }
 
             return {
                 skipped: true
@@ -269,6 +279,14 @@ export const processSingleTicketEscalation = async (ticketId) => {
         console.log(
             "================================="
         );
+
+        if (ticket.assigned_to) {
+            await addEmailJob({
+                ticketId: ticket.id,
+                recipientId: ticket.assigned_to,
+                template: EMAIL_TEMPLATES.SLA_ESCALATED
+            });
+        }
 
         return {
             escalated: true

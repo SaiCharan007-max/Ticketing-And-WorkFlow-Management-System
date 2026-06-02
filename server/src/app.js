@@ -10,6 +10,7 @@ import analyticsRoutes from "./routes/analytics.routes.js";
 import globalErrorHandler from "./middlewares/error.middleware.js";
 import "./config/redis.js";
 import "./workers/sla.worker.js";
+import "./workers/email.worker.js";
 
 const app = express();
 

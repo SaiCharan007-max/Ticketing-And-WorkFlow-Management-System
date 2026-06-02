@@ -1,6 +1,7 @@
 import pool from "../config/db.js";
 import redisClient from "../config/redis.js";
 import { addSlaJob } from "../queues/sla.queue.js";
+import {addEmailJob} from "../queues/email.queue.js";
 import * as assignmentRepo from "../repositories/assignment.repository.js";
 import * as auditRepo from "../repositories/audit.repository.js";
 import * as categoryRepo from "../repositories/category.repository.js";
@@ -11,6 +12,8 @@ import * as ticketRepo from "../repositories/ticket.repository.js";
 import allowedTransitions from "../constants/allowedTransitions.js";
 import { allowedSortFields, allowedOrders } from "../constants/allowedQueryParamValues.js";
 import SLA_HOURS from "../constants/slaHours.js";
+import EMAIL_TEMPLATES from "../constants/emailTemplates.js";
+
 
 import AppError from "../utils/AppError.js";
 
@@ -145,6 +148,12 @@ export const createTicketWorkflow = async (
             "analytics:departments",
             "analytics:staff-workload"
         );
+
+        await addEmailJob({
+            ticketId: createdTicket.id,
+            recipientId: createdBy,
+            template: EMAIL_TEMPLATES.TICKET_CREATED
+        });
 
         return createdTicket;
 
@@ -346,6 +355,12 @@ export const updateTicketAssignment = async ({
             "analytics:departments",
             "analytics:staff-workload"
         );
+
+        await addEmailJob({
+    ticketId,
+    recipientId: assignedTo,
+    template: EMAIL_TEMPLATES.TICKET_ASSIGNED
+});
 
         return updatedTicket;
 

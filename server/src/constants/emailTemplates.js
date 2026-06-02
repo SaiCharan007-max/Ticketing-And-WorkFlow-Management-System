@@ -1,0 +1,27 @@
+// constants/emailTemplates.js
+
+const EMAIL_TEMPLATES = {
+
+    TICKET_CREATED:
+        "TICKET_CREATED",
+
+    TICKET_ASSIGNED:
+        "TICKET_ASSIGNED",
+
+    TICKET_REASSIGNED:
+        "TICKET_REASSIGNED",
+
+    TICKET_RESOLVED:
+        "TICKET_RESOLVED",
+
+    TICKET_CLOSED:
+        "TICKET_CLOSED",
+
+    SLA_ESCALATED:
+        "SLA_ESCALATED",
+
+    CRITICAL_SLA_BREACH:
+        "CRITICAL_SLA_BREACH"
+};
+
+export default EMAIL_TEMPLATES;
