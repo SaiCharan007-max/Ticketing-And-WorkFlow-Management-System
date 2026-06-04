@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import crypto from "crypto";
+import pool from "../config/db.js";
 
 import AppError from "../utils/AppError.js";
 
@@ -7,8 +9,14 @@ import {
     findUserByEmail,
     createUser
 } from "../repositories/auth.repository.js";
+import { getUserById } from "../repositories/user.repository.js";
+import {
+    createRefreshToken,
+    findRefreshToken,
+    deleteRefreshToken
+} from "../repositories/refreshToken.repository.js";
 
-const generateToken = (user) => {
+const generateAccessToken = (user) => {
 
     return jwt.sign(
         {
@@ -17,7 +25,7 @@ const generateToken = (user) => {
         },
         process.env.JWT_SECRET,
         {
-            expiresIn: "1h"
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY
         }
     );
 };
@@ -47,7 +55,7 @@ export const registerUser = async ({
         });
 
     const token =
-        generateToken(createdUser);
+        generateAccessToken(createdUser);
 
     return {
         token,
@@ -60,38 +68,254 @@ export const loginUser = async ({
     password
 }) => {
 
-    const user =
-        await findUserByEmail(email);
+    let client;
 
-    if (!user) {
-        throw new AppError(
-            401,
-            "Invalid email or password"
+    try {
+
+        client = await pool.connect();
+
+        await client.query("BEGIN");
+
+        const user =
+            await findUserByEmail(email);
+
+        if (!user) {
+            throw new AppError(
+                401,
+                "Invalid email or password"
+            );
+        }
+
+        const isMatch =
+            await bcrypt.compare(
+                password,
+                user.password_hash
+            );
+
+        if (!isMatch) {
+            throw new AppError(
+                401,
+                "Invalid email or password"
+            );
+        }
+
+        const accessToken =
+            generateAccessToken(user);
+
+        const refreshToken =
+            crypto
+                .randomBytes(64)
+                .toString("hex");
+
+        const expiresAt =
+            new Date(
+                Date.now() +
+                Number(
+                    process.env
+                        .REFRESH_TOKEN_EXPIRY
+                ) *
+                24 *
+                60 *
+                60 *
+                1000
+            );
+
+        const createdRefreshToken =
+            await createRefreshToken({
+                client,
+                token: refreshToken,
+                userId: user.id,
+                expiresAt
+            });
+
+        await client.query(
+            "COMMIT"
         );
+
+        return {
+            accessToken,
+            refreshToken:
+                createdRefreshToken.token,
+            user: {
+                id: user.id,
+                email: user.email,
+                role: user.role
+            }
+        };
+
+    } catch (err) {
+
+        if (client) {
+            await client.query(
+                "ROLLBACK"
+            );
+        }
+
+        throw err;
+
+    } finally {
+
+        if (client) {
+            client.release();
+        }
     }
+};
 
-    const isMatch =
-        await bcrypt.compare(
-            password,
-            user.password_hash
+export const refreshUserToken = async (
+    token
+) => {
+
+    let client;
+
+    try {
+
+        client =
+            await pool.connect();
+
+        await client.query(
+            "BEGIN"
         );
 
-    if (!isMatch) {
-        throw new AppError(
-            401,
-            "Invalid email or password"
+        const existingToken =
+            await findRefreshToken({
+                client,
+                token
+            });
+
+        if (
+            !existingToken ||
+            existingToken.expires_at <
+            new Date()
+        ) {
+
+            await client.query(
+                "ROLLBACK"
+            );
+
+            return null;
+        }
+
+        const user =
+            await getUserById(
+                client,
+                existingToken.user_id
+            );
+
+        if (!user) {
+
+            await client.query(
+                "ROLLBACK"
+            );
+
+            return null;
+        }
+
+        const accessToken =
+            generateAccessToken(
+                user
+            );
+
+        const newRefreshToken =
+            crypto
+                .randomBytes(64)
+                .toString("hex");
+
+        const expiresAt =
+            new Date(
+                Date.now() +
+                Number(
+                    process.env
+                        .REFRESH_TOKEN_EXPIRY
+                ) *
+                24 *
+                60 *
+                60 *
+                1000
+            );
+
+        await deleteRefreshToken({
+            client,
+            token:
+                existingToken.token
+        });
+
+        const createdToken =
+            await createRefreshToken({
+                client,
+                token:
+                    newRefreshToken,
+                userId:
+                    user.id,
+                expiresAt
+            });
+
+        await client.query(
+            "COMMIT"
         );
+
+        return {
+            accessToken,
+            refreshToken:
+                createdToken.token
+        };
+
+    } catch (err) {
+
+        if (client) {
+            await client.query(
+                "ROLLBACK"
+            );
+        }
+
+        throw err;
+
+    } finally {
+
+        if (client) {
+            client.release();
+        }
     }
+};
 
-    const token =
-        generateToken(user);
+export const logoutUser =
+    async (token) => {
 
-    return {
-        token,
-        user: {
-            id: user.id,
-            email: user.email,
-            role: user.role
+        let client;
+
+        try {
+
+            client =
+                await pool.connect();
+
+            await client.query(
+                "BEGIN"
+            );
+
+            await deleteRefreshToken({
+                client,
+                token
+            });
+
+            await client.query(
+                "COMMIT"
+            );
+
+            return true;
+
+        } catch (err) {
+
+            if (client) {
+                await client.query(
+                    "ROLLBACK"
+                );
+            }
+
+            throw err;
+
+        } finally {
+
+            if (client) {
+                client.release();
+            }
         }
     };
-};

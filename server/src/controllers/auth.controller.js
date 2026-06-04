@@ -2,10 +2,7 @@ import { validationResult } from "express-validator";
 
 import asyncHandler from "../utils/asyncHandler.js";
 
-import {
-    registerUser,
-    loginUser
-} from "../services/auth.service.js";
+import * as authService from "../services/auth.service.js";
 
 export const register = asyncHandler(
     async (req, res) => {
@@ -23,7 +20,7 @@ export const register = asyncHandler(
             req.body;
 
         const result =
-            await registerUser({
+            await authService.registerUser({
                 email,
                 password
             });
@@ -52,15 +49,65 @@ export const login = asyncHandler(
             req.body;
 
         const result =
-            await loginUser({
+            await authService.loginUser({
                 email,
                 password
             });
 
         return res.status(200).json({
             success: true,
-            token: result.token,
+            accessToken: result.accessToken,
+            refreshToken: result.refreshToken,
             user: result.user
         });
     }
 );
+
+export const refreshToken = asyncHandler(
+    async (req, res) => {
+        const { refreshToken } = req.body;
+        if (!refreshToken) {
+            return res.status(400).json({
+                success: false,
+                message: "Refresh token is required"
+            });
+        }
+        const result = await authService.refreshUserToken(refreshToken);
+        if (!result) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid refresh token"
+            });
+        }
+        return res.status(200).json({
+            success: true,
+            accessToken: result.accessToken,
+            refreshToken: result.refreshToken
+        });
+    }
+);
+
+export const logoutUser = asyncHandler(
+    async (req, res) => {
+        const { refreshToken } = req.body;
+        if (!refreshToken) {
+            return res.status(400).json({
+                success: false,
+                message: "Refresh token is required"
+            });
+        }
+        const result = await authService.logoutUser(refreshToken);
+        if (!result) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid refresh token"
+            });
+        }
+        return res.status(200).json({
+            success: true,
+            message: "Logged out successfully"
+        });
+    }
+);
+
+

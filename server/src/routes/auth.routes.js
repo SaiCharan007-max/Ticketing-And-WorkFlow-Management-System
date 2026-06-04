@@ -1,5 +1,5 @@
 import express from "express";
-import { login, register } from "../controllers/auth.controller.js";
+import { login, register, refreshToken, logoutUser } from "../controllers/auth.controller.js";
 import { body } from "express-validator";
 
 
@@ -18,5 +18,9 @@ router.post("/login",
         body("password").notEmpty()
     ]
     , login);
+
+router.post("/refresh", refreshToken);
+
+router.post("/logout", logoutUser);
 
 export default router;
