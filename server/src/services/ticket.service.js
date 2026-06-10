@@ -1,7 +1,7 @@
 import pool from "../config/db.js";
 import redisClient from "../config/redis.js";
 import { addSlaJob } from "../queues/sla.queue.js";
-import {addEmailJob} from "../queues/email.queue.js";
+import { addEmailJob } from "../queues/email.queue.js";
 import * as assignmentRepo from "../repositories/assignment.repository.js";
 import * as auditRepo from "../repositories/audit.repository.js";
 import * as categoryRepo from "../repositories/category.repository.js";
@@ -13,22 +13,20 @@ import allowedTransitions from "../constants/allowedTransitions.js";
 import { allowedSortFields, allowedOrders } from "../constants/allowedQueryParamValues.js";
 import SLA_HOURS from "../constants/slaHours.js";
 import EMAIL_TEMPLATES from "../constants/emailTemplates.js";
-
+import { getIO } from "../config/socket.js";
 
 import AppError from "../utils/AppError.js";
+
 
 export const createTicketWorkflow = async (
     ticketData
 ) => {
-
     let client;
-
     try {
+        const io = getIO();
 
         client = await pool.connect();
-
         await client.query("BEGIN");
-
         const {
             title,
             description,
@@ -155,6 +153,22 @@ export const createTicketWorkflow = async (
             template: EMAIL_TEMPLATES.TICKET_CREATED
         });
 
+
+        if (assignedTo) {
+
+            io.to(`user:${assignedTo}`)
+                .emit("ticket:assigned", {
+                    ticketId: createdTicket.id,
+                    title: createdTicket.title,
+                    status: createdTicket.status,
+                    priority: createdTicket.priority,
+                    assignedTo: createdTicket.assigned_to,
+                    createdBy: createdTicket.created_by,
+                    createdAt: createdTicket.created_at
+                }
+                );
+        }
+
         return createdTicket;
 
     } catch (err) {
@@ -181,6 +195,8 @@ export const updateTicketStatus = async ({
     userId,
     userRole
 }) => {
+
+    const io = getIO();
 
     let client;
 
@@ -256,6 +272,32 @@ export const updateTicketStatus = async ({
         await redisClient.del("departmentAnalytics");
         await redisClient.del("staffWorkload");
 
+        io.to(`user:${ticket.created_by}`)
+            .emit("ticket:status-updated", {
+                ticketId: updatedTicket.id,
+                title: updatedTicket.title,
+                status: updatedTicket.status,
+                priority: updatedTicket.priority,
+                assignedTo: updatedTicket.assigned_to,
+                createdBy: updatedTicket.created_by,
+                createdAt: updatedTicket.created_at
+            }
+            );
+
+        if (updatedTicket.assigned_to) {
+            io.to(`user:${updatedTicket.assigned_to}`)
+                .emit("ticket:status-updated", {
+                    ticketId: updatedTicket.id,
+                    title: updatedTicket.title,
+                    status: updatedTicket.status,
+                    priority: updatedTicket.priority,
+                    assignedTo: updatedTicket.assigned_to,
+                    createdBy: updatedTicket.created_by,
+                    createdAt: updatedTicket.created_at
+                }
+                );
+        }
+
 
         return updatedTicket;
 
@@ -282,6 +324,7 @@ export const updateTicketAssignment = async ({
     assignedTo,
     assignedBy
 }) => {
+    const io = getIO();
 
     let client;
 
@@ -357,10 +400,36 @@ export const updateTicketAssignment = async ({
         );
 
         await addEmailJob({
-    ticketId,
-    recipientId: assignedTo,
-    template: EMAIL_TEMPLATES.TICKET_ASSIGNED
-});
+            ticketId,
+            recipientId: assignedTo,
+            template: EMAIL_TEMPLATES.TICKET_ASSIGNED
+        });
+
+        io.to(`user:${ticket.created_by}`)
+            .emit("ticket:assignment-updated", {
+                ticketId: updatedTicket.id,
+                title: updatedTicket.title,
+                status: updatedTicket.status,
+                priority: updatedTicket.priority,
+                assignedTo: updatedTicket.assigned_to,
+                createdBy: updatedTicket.created_by,
+                createdAt: updatedTicket.created_at
+            }
+            );
+
+        if (updatedTicket.assigned_to) {
+            io.to(`user:${updatedTicket.assigned_to}`)
+                .emit("ticket:assignment-updated", {
+                    ticketId: updatedTicket.id,
+                    title: updatedTicket.title,
+                    status: updatedTicket.status,
+                    priority: updatedTicket.priority,
+                    assignedTo: updatedTicket.assigned_to,
+                    createdBy: updatedTicket.created_by,
+                    createdAt: updatedTicket.created_at
+                }
+                );
+        }
 
         return updatedTicket;
 

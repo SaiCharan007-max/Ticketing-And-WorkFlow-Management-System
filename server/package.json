@@ -29,6 +29,8 @@
     "nodemailer": "^8.0.10",
     "pg": "^8.20.0",
     "redis": "^6.0.0",
-    "redis-server": "^1.2.2"
+    "redis-server": "^1.2.2",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3"
   }
 }
