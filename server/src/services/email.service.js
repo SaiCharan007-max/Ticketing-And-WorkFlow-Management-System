@@ -3,7 +3,7 @@ import * as userRepo from "../repositories/user.repository.js";
 import * as ticketRepo from "../repositories/ticket.repository.js";
 import pool from "../config/db.js";
 import { buildEmailTemplate } from "../templates/emailTemplateBuilders.js";
-import AppError from "../utils/appError.js";
+import AppError from "../utils/AppError.js";
 
 export const sendEmail = async ({
     ticketId,
