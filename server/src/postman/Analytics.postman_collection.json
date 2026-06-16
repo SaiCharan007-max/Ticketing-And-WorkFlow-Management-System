@@ -1,0 +1,102 @@
+{
+  "info": {
+    "name": "Analytics API",
+    "_postman_id": "7b9dfdb0-8cf8-4707-bf35-24f0c3d11111",
+    "description": "Analytics endpoints for Ticketing Workflow Management System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api"
+    },
+
+    {
+      "key": "adminToken",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJSb2xlIjoiYWRtaW4iLCJpYXQiOjE3ODE1OTE3MTcsImV4cCI6MTc4MTU5MjYxN30.YtBoHRDPMV5MltZgHI6hhE3JY901mG3hnMqixaGIpq0"
+    }
+  ],
+
+  "item": [
+
+    {
+
+      "name": "Get Ticket Analytics",
+
+      "request": {
+
+        "method": "GET",
+
+        "header": [
+
+          {
+
+            "key": "Authorization",
+
+            "value": "Bearer {{adminToken}}"
+
+          }
+
+        ],
+
+        "url": "{{baseUrl}}/analytics/tickets"
+
+      }
+
+    },
+
+    {
+
+      "name": "Get Department Analytics",
+
+      "request": {
+
+        "method": "GET",
+
+        "header": [
+
+          {
+
+            "key": "Authorization",
+
+            "value": "Bearer {{adminToken}}"
+
+          }
+
+        ],
+
+        "url": "{{baseUrl}}/analytics/departments"
+
+      }
+
+    },
+
+    {
+
+      "name": "Get Staff Workload",
+
+      "request": {
+
+        "method": "GET",
+
+        "header": [
+
+          {
+
+            "key": "Authorization",
+
+            "value": "Bearer {{adminToken}}"
+
+          }
+
+        ],
+
+        "url": "{{baseUrl}}/analytics/staff-workload"
+
+      }
+
+    }
+
+  ]
+}

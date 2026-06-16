@@ -1,0 +1,151 @@
+{
+  "info": {
+    "name": "Staff API",
+    "_postman_id": "0bfe7d74-f0a3-4c51-a381-c8b48c111111",
+    "description": "Staff management endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+
+  "variable": [
+
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api"
+    },
+
+    {
+      "key": "staffId",
+      "value": ""
+    },
+
+    {
+      "key": "adminToken",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJSb2xlIjoiYWRtaW4iLCJpYXQiOjE3ODE1OTE3MTcsImV4cCI6MTc4MTU5MjYxN30.YtBoHRDPMV5MltZgHI6hhE3JY901mG3hnMqixaGIpq0"
+    }
+
+  ],
+
+  "item": [
+
+    {
+
+      "name": "Create Staff",
+
+      "event": [
+
+        {
+
+          "listen": "test",
+
+          "script": {
+
+            "exec": [
+
+              "const response=pm.response.json();",
+
+              "if(response.staff && response.staff.id){",
+
+              "pm.collectionVariables.set('staffId',response.staff.id);",
+
+              "}"
+
+            ]
+
+          }
+
+        }
+
+      ],
+
+      "request": {
+
+        "method": "POST",
+
+        "header": [
+
+          {
+
+            "key": "Authorization",
+
+            "value": "Bearer {{adminToken}}"
+
+          },
+
+          {
+
+            "key": "Content-Type",
+
+            "value": "application/json"
+
+          }
+
+        ],
+
+        "url": "{{baseUrl}}/staff",
+
+        "body": {
+
+          "mode": "raw",
+
+          "raw": "{\n\"name\":\"John Staff\",\n\"email\":\"johnstaff@gmail.com\",\n\"password\":\"password123\",\n\"departmentId\":1\n}"
+
+        }
+
+      }
+
+    },
+
+    {
+
+      "name": "Get All Staff",
+
+      "request": {
+
+        "method": "GET",
+
+        "header": [
+
+          {
+
+            "key": "Authorization",
+
+            "value": "Bearer {{adminToken}}"
+
+          }
+
+        ],
+
+        "url": "{{baseUrl}}/staff"
+
+      }
+
+    },
+
+    {
+
+      "name": "Delete Staff",
+
+      "request": {
+
+        "method": "DELETE",
+
+        "header": [
+
+          {
+
+            "key": "Authorization",
+
+            "value": "Bearer {{adminToken}}"
+
+          }
+
+        ],
+
+        "url": "{{baseUrl}}/staff/{{staffId}}"
+
+      }
+
+    }
+
+  ]
+}

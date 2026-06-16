@@ -1,0 +1,155 @@
+{
+  "info": {
+    "name": "Categories API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+
+  "variable": [
+
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api"
+    },
+
+    {
+      "key": "departmentId",
+      "value": "1"
+    },
+
+    {
+      "key": "categoryId",
+      "value": ""
+    },
+
+    {
+      "key": "adminToken",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJSb2xlIjoiYWRtaW4iLCJpYXQiOjE3ODE2MjM3NTIsImV4cCI6MTc4MTYyNDY1Mn0.StQsn3TEANCZWTHuA-NrTske1zpjtpa9VvzXs3DeRXU"
+    }
+
+  ],
+
+  "item": [
+
+    {
+
+      "name": "Create Category",
+
+      "event": [
+
+        {
+
+          "listen": "test",
+
+          "script": {
+
+            "exec": [
+
+              "const response=pm.response.json();",
+
+              "if(response.category && response.category.id){",
+
+              "pm.collectionVariables.set('categoryId',response.category.id);",
+
+              "}"
+
+            ]
+
+          }
+
+        }
+
+      ],
+
+      "request": {
+
+        "method": "POST",
+
+        "header": [
+
+          {
+
+            "key": "Authorization",
+
+            "value": "Bearer {{adminToken}}"
+
+          },
+
+          {
+
+            "key": "Content-Type",
+
+            "value": "application/json"
+
+          }
+
+        ],
+
+        "url": "{{baseUrl}}/categories",
+
+        "body": {
+
+          "mode": "raw",
+
+          "raw": "{\n\"name\":\"Network Issues\",\n\"departmentId\":{{departmentId}}\n}"
+
+        }
+
+      }
+
+    },
+
+    {
+
+      "name": "Get All Categories",
+
+      "request": {
+
+        "method": "GET",
+
+        "header": [
+
+          {
+
+            "key": "Authorization",
+
+            "value": "Bearer {{adminToken}}"
+
+          }
+
+        ],
+
+        "url": "{{baseUrl}}/categories"
+
+      }
+
+    },
+
+    {
+
+      "name": "Delete Category",
+
+      "request": {
+
+        "method": "DELETE",
+
+        "header": [
+
+          {
+
+            "key": "Authorization",
+
+            "value": "Bearer {{adminToken}}"
+
+          }
+
+        ],
+
+        "url": "{{baseUrl}}/categories/{{categoryId}}"
+
+      }
+
+    }
+
+  ]
+
+}

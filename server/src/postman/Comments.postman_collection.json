@@ -1,0 +1,137 @@
+{
+  "info": {
+    "name": "Comments API",
+    "_postman_id": "f9b97cb8-0e31-4db6-a1c0-a8f16d111111",
+    "description": "Comments endpoints for Ticketing Workflow Management System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api"
+    },
+
+    {
+      "key": "ticketId",
+      "value": "32"
+    },
+
+    {
+      "key": "adminToken",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJSb2xlIjoiYWRtaW4iLCJpYXQiOjE3ODE2MjM3NTIsImV4cCI6MTc4MTYyNDY1Mn0.StQsn3TEANCZWTHuA-NrTske1zpjtpa9VvzXs3DeRXU"
+    },
+
+    {
+      "key": "userToken",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE0LCJ1c2VyUm9sZSI6InVzZXIiLCJpYXQiOjE3ODE2MjM4MTcsImV4cCI6MTc4MTYyNDcxN30.Ihj4EKiRRRDg30R60pm1nzYZxFpTKR3LFSHE3uXVQoY"
+    },
+
+    {
+      "key": "staffToken",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJ1c2VyUm9sZSI6InN0YWZmIiwiaWF0IjoxNzgxNjIzODQyLCJleHAiOjE3ODE2MjQ3NDJ9.Lv7mD95M1Xw0PS6kcpctcUFllntSjYEfFLspMdfF8D8"
+    }
+  ],
+
+  "item": [
+
+    {
+      "name": "User Add Comment",
+
+      "request": {
+        "method": "POST",
+
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{userToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+
+        "url": "{{baseUrl}}/tickets/{{ticketId}}/comments",
+
+        "body": {
+          "mode": "raw",
+
+          "raw": "{\n\"content\":\"I am still facing this issue.\"\n}"
+        }
+      }
+    },
+
+    {
+      "name": "Staff Add Comment",
+
+      "request": {
+        "method": "POST",
+
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+
+        "url": "{{baseUrl}}/tickets/{{ticketId}}/comments",
+
+        "body": {
+          "mode": "raw",
+
+          "raw": "{\n\"content\":\"We are investigating the issue.\"\n}"
+        }
+      }
+    },
+
+    {
+      "name": "Admin Add Comment",
+
+      "request": {
+        "method": "POST",
+
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+
+        "url": "{{baseUrl}}/tickets/{{ticketId}}/comments",
+
+        "body": {
+          "mode": "raw",
+
+          "raw": "{\n\"content\":\"Escalation approved.\"\n}"
+        }
+      }
+    },
+
+    {
+      "name": "Get Comments",
+
+      "request": {
+        "method": "GET",
+
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{userToken}}"
+          }
+        ],
+
+        "url": "{{baseUrl}}/tickets/{{ticketId}}/comments"
+      }
+    }
+
+  ]
+}

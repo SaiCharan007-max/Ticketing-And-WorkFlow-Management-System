@@ -8,6 +8,10 @@ import slaRoutes from "./routes/sla.routes.js";
 import commentsRoutes from "./routes/comments.routes.js";
 import analyticsRoutes from "./routes/analytics.routes.js";
 import globalErrorHandler from "./middlewares/error.middleware.js";
+import swaggerUi from "swagger-ui-express";
+import swaggerUiConfig from "./config/swagger-ui.js";
+import swaggerSpec from "./config/swagger.js";
+
 import "./config/redis.js";
 import "./workers/sla.worker.js";
 import "./workers/email.worker.js";
@@ -26,6 +30,18 @@ app.use("/api/auth", authRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/sla", slaRoutes);
 app.use("/api/tickets", commentsRoutes);
+app.use(
+    "/api-docs",
+
+    swaggerUi.serve,
+
+    swaggerUi.setup(
+        swaggerSpec,
+
+        swaggerUiConfig
+    )
+
+);
 
 app.use(globalErrorHandler);
 export default app;

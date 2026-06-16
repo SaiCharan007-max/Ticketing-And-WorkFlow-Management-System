@@ -1,0 +1,336 @@
+{
+  "info": {
+    "name": "Tickets API",
+    "_postman_id": "b3d02a31-a8d8-40f8-a5b0-f65b9486d111",
+    "description": "Ticket workflow testing collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+
+  "variable": [
+
+    {
+      "key":"baseUrl",
+      "value":"http://localhost:5000/api"
+    },
+
+    {
+      "key":"ticketId",
+      "value":""
+    },
+
+    {
+      "key":"adminToken",
+      "value":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJSb2xlIjoiYWRtaW4iLCJpYXQiOjE3ODE1OTE3MTcsImV4cCI6MTc4MTU5MjYxN30.YtBoHRDPMV5MltZgHI6hhE3JY901mG3hnMqixaGIpq0"
+    },
+
+    {
+      "key":"staffToken",
+      "value":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJ1c2VyUm9sZSI6InN0YWZmIiwiaWF0IjoxNzgxNTkxNzA3LCJleHAiOjE3ODE1OTI2MDd9.Vz5spC5WFRfUgAdPMJXb-j5QacCDnA5LjVzrkazEvtE"
+    },
+
+    {
+      "key":"userToken",
+      "value":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE0LCJ1c2VyUm9sZSI6InVzZXIiLCJpYXQiOjE3ODE1OTE2ODgsImV4cCI6MTc4MTU5MjU4OH0.3OLeie3NCyDOsDaA7pLGMvX8gPuZMx2qBu2lYWBax-k"
+    }
+
+  ],
+
+  "item":[
+
+    {
+
+      "name":"Create Ticket",
+
+      "event":[
+
+        {
+
+          "listen":"test",
+
+          "script":{
+
+            "exec":[
+
+              "const response=pm.response.json();",
+
+              "if(response.ticket && response.ticket.id){",
+
+              "pm.collectionVariables.set('ticketId',response.ticket.id);",
+
+              "}"
+
+            ]
+
+          }
+
+        }
+
+      ],
+
+      "request":{
+
+        "method":"POST",
+
+        "header":[
+
+          {
+            "key":"Authorization",
+
+            "value":"Bearer {{userToken}}"
+          },
+
+          {
+            "key":"Content-Type",
+
+            "value":"application/json"
+          }
+
+        ],
+
+        "url":"{{baseUrl}}/tickets",
+
+        "body":{
+
+          "mode":"raw",
+
+          "raw":"{\n\"title\":\"VPN Issue\",\n\"description\":\"Unable to connect to VPN\",\n\"priority\":\"HIGH\",\n\"categoryId\":1\n}"
+
+        }
+
+      }
+
+    },
+
+    {
+
+      "name":"Get My Tickets",
+
+      "request":{
+
+        "method":"GET",
+
+        "header":[
+
+          {
+
+            "key":"Authorization",
+
+            "value":"Bearer {{userToken}}"
+
+          }
+
+        ],
+
+        "url":"{{baseUrl}}/tickets/my?page=1&limit=10"
+
+      }
+
+    },
+
+    {
+
+      "name":"Get Ticket By Id",
+
+      "request":{
+
+        "method":"GET",
+
+        "header":[
+
+          {
+
+            "key":"Authorization",
+
+            "value":"Bearer {{userToken}}"
+
+          }
+
+        ],
+
+        "url":"{{baseUrl}}/tickets/{{ticketId}}"
+
+      }
+
+    },
+
+    {
+
+      "name":"Assign Ticket",
+
+      "request":{
+
+        "method":"PATCH",
+
+        "header":[
+
+          {
+
+            "key":"Authorization",
+
+            "value":"Bearer {{adminToken}}"
+
+          },
+
+          {
+
+            "key":"Content-Type",
+
+            "value":"application/json"
+
+          }
+
+        ],
+
+        "url":"{{baseUrl}}/tickets/{{ticketId}}/assign",
+
+        "body":{
+
+          "mode":"raw",
+
+          "raw":"{\n\"assignedTo\":16\n}"
+
+        }
+
+      }
+
+    },
+
+    {
+
+      "name":"Get Assigned Tickets",
+
+      "request":{
+
+        "method":"GET",
+
+        "header":[
+
+          {
+
+            "key":"Authorization",
+
+            "value":"Bearer {{staffToken}}"
+
+          }
+
+        ],
+
+        "url":"{{baseUrl}}/tickets/assigned?page=1&limit=10"
+
+      }
+
+    },
+
+    {
+
+      "name":"Update Status -> IN_PROGRESS",
+
+      "request":{
+
+        "method":"PATCH",
+
+        "header":[
+
+          {
+
+            "key":"Authorization",
+
+            "value":"Bearer {{staffToken}}"
+
+          },
+
+          {
+
+            "key":"Content-Type",
+
+            "value":"application/json"
+
+          }
+
+        ],
+
+        "url":"{{baseUrl}}/tickets/{{ticketId}}/status",
+
+        "body":{
+
+          "mode":"raw",
+
+          "raw":"{\n\"status\":\"IN_PROGRESS\"\n}"
+
+        }
+
+      }
+
+    },
+
+    {
+
+      "name":"Update Status -> RESOLVED",
+
+      "request":{
+
+        "method":"PATCH",
+
+        "header":[
+
+          {
+
+            "key":"Authorization",
+
+            "value":"Bearer {{staffToken}}"
+
+          },
+
+          {
+
+            "key":"Content-Type",
+
+            "value":"application/json"
+
+          }
+
+        ],
+
+        "url":"{{baseUrl}}/tickets/{{ticketId}}/status",
+
+        "body":{
+
+          "mode":"raw",
+
+          "raw":"{\n\"status\":\"RESOLVED\"\n}"
+
+        }
+
+      }
+
+    },
+
+    {
+
+      "name":"Get Ticket History",
+
+      "request":{
+
+        "method":"GET",
+
+        "header":[
+
+          {
+
+            "key":"Authorization",
+
+            "value":"Bearer {{adminToken}}"
+
+          }
+
+        ],
+
+        "url":"{{baseUrl}}/tickets/{{ticketId}}/history"
+
+      }
+
+    }
+
+  ]
+
+}

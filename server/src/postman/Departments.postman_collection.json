@@ -1,0 +1,150 @@
+{
+  "info": {
+    "name": "Departments API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+
+  "variable": [
+
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api"
+    },
+
+    {
+      "key": "departmentId",
+      "value": ""
+    },
+
+    {
+      "key": "adminToken",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJSb2xlIjoiYWRtaW4iLCJpYXQiOjE3ODE2MjM3NTIsImV4cCI6MTc4MTYyNDY1Mn0.StQsn3TEANCZWTHuA-NrTske1zpjtpa9VvzXs3DeRXU"
+    }
+
+  ],
+
+  "item": [
+
+    {
+
+      "name": "Create Department",
+
+      "event": [
+
+        {
+
+          "listen": "test",
+
+          "script": {
+
+            "exec": [
+
+              "const response=pm.response.json();",
+
+              "if(response.department && response.department.id){",
+
+              "pm.collectionVariables.set('departmentId',response.department.id);",
+
+              "}"
+
+            ]
+
+          }
+
+        }
+
+      ],
+
+      "request": {
+
+        "method": "POST",
+
+        "header": [
+
+          {
+
+            "key": "Authorization",
+
+            "value": "Bearer {{adminToken}}"
+
+          },
+
+          {
+
+            "key": "Content-Type",
+
+            "value": "application/json"
+
+          }
+
+        ],
+
+        "url": "{{baseUrl}}/departments",
+
+        "body": {
+
+          "mode": "raw",
+
+          "raw": "{\n\"name\":\"IT Support\"\n}"
+
+        }
+
+      }
+
+    },
+
+    {
+
+      "name": "Get All Departments",
+
+      "request": {
+
+        "method": "GET",
+
+        "header": [
+
+          {
+
+            "key": "Authorization",
+
+            "value": "Bearer {{adminToken}}"
+
+          }
+
+        ],
+
+        "url": "{{baseUrl}}/departments"
+
+      }
+
+    },
+
+    {
+
+      "name": "Delete Department",
+
+      "request": {
+
+        "method": "DELETE",
+
+        "header": [
+
+          {
+
+            "key": "Authorization",
+
+            "value": "Bearer {{adminToken}}"
+
+          }
+
+        ],
+
+        "url": "{{baseUrl}}/departments/{{departmentId}}"
+
+      }
+
+    }
+
+  ]
+
+}
