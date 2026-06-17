@@ -1,7 +1,7 @@
 import { createClient } from 'redis';
 
 const redisClient = createClient({
-    url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`
+    url: process.env.REDIS_URL
 });
 
 redisClient.on("error", 
@@ -12,7 +12,7 @@ redisClient.on("error",
 
 redisClient.on("connect", 
     () => {
-        console.log("Redis connected")
+        console.log("Redis connected");
     }
 );
 
