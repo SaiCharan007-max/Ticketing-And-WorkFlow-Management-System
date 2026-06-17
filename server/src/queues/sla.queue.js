@@ -4,8 +4,7 @@ const slaQueue = new Queue(
     "sla-escalation",
     {
         connection: {
-            host: process.env.REDIS_HOST || "localhost",
-            port: Number(process.env.REDIS_PORT) || 6379
+            url: process.env.REDIS_URL
         }
     }
 );
